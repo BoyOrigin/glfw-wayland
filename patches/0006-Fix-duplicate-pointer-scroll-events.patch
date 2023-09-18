@@ -1,0 +1,38 @@
+From 9105e5e907f98fa966d91e1725cb00a2c71030f5 Mon Sep 17 00:00:00 2001
+From: BoyOrigin <ahmadyasinfikri@gmail.com>
+Date: Tue, 19 Sep 2023 03:31:57 +0700
+Subject: [PATCH] Fix duplicate pointer scroll events
+
+
+diff --git a/src/wl_platform.h b/src/wl_platform.h
+index e9dd0b4a..ea50dd55 100644
+--- a/src/wl_platform.h
++++ b/src/wl_platform.h
+@@ -412,6 +412,8 @@ typedef struct _GLFWwindowWayland
+         _GLFWdecorationWayland             top, left, right, bottom;
+         _GLFWdecorationSideWayland         focus;
+     } decorations;
++
++    uint32_t                    pointerAxisTime;
+ } _GLFWwindowWayland;
+ 
+ // Wayland-specific global data
+diff --git a/src/wl_window.c b/src/wl_window.c
+index 602981b9..34564e21 100644
+--- a/src/wl_window.c
++++ b/src/wl_window.c
+@@ -1508,6 +1508,11 @@ static void pointerHandleAxis(void* userData,
+     if (!window)
+         return;
+ 
++    // On newer GNOME, there is a bug where scroll events are invoked twice. This code will fix that issue.
++    if (window->wl.pointerAxisTime == time)
++        return;
++    window->wl.pointerAxisTime = time;
++
+     assert(axis == WL_POINTER_AXIS_HORIZONTAL_SCROLL ||
+            axis == WL_POINTER_AXIS_VERTICAL_SCROLL);
+ 
+-- 
+2.42.0
+

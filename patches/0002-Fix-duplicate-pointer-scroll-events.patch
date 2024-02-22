@@ -1,27 +1,27 @@
-From 9105e5e907f98fa966d91e1725cb00a2c71030f5 Mon Sep 17 00:00:00 2001
+From fb39b826d4b087ee8653767bb4ac189adc46c249 Mon Sep 17 00:00:00 2001
 From: BoyOrigin <ahmadyasinfikri@gmail.com>
 Date: Tue, 19 Sep 2023 03:31:57 +0700
 Subject: [PATCH] Fix duplicate pointer scroll events
 
 
 diff --git a/src/wl_platform.h b/src/wl_platform.h
-index e9dd0b4a..ea50dd55 100644
+index 149cd241..b17fa722 100644
 --- a/src/wl_platform.h
 +++ b/src/wl_platform.h
-@@ -412,6 +412,8 @@ typedef struct _GLFWwindowWayland
-         _GLFWdecorationWayland             top, left, right, bottom;
-         _GLFWdecorationSideWayland         focus;
-     } decorations;
+@@ -413,6 +413,8 @@ typedef struct _GLFWwindowWayland
+         _GLFWfallbackEdgeWayland    top, left, right, bottom;
+         struct wl_surface*          focus;
+     } fallback;
 +
 +    uint32_t                    pointerAxisTime;
  } _GLFWwindowWayland;
  
  // Wayland-specific global data
 diff --git a/src/wl_window.c b/src/wl_window.c
-index 602981b9..34564e21 100644
+index 31fe9c14..aab79d01 100644
 --- a/src/wl_window.c
 +++ b/src/wl_window.c
-@@ -1508,6 +1508,11 @@ static void pointerHandleAxis(void* userData,
+@@ -1617,6 +1617,11 @@ static void pointerHandleAxis(void* userData,
      if (!window)
          return;
  
@@ -30,9 +30,9 @@ index 602981b9..34564e21 100644
 +        return;
 +    window->wl.pointerAxisTime = time;
 +
-     assert(axis == WL_POINTER_AXIS_HORIZONTAL_SCROLL ||
-            axis == WL_POINTER_AXIS_VERTICAL_SCROLL);
- 
+     // NOTE: 10 units of motion per mouse wheel step seems to be a common ratio
+     if (axis == WL_POINTER_AXIS_HORIZONTAL_SCROLL)
+         _glfwInputScroll(window, -wl_fixed_to_double(value) / 10.0, 0.0);
 -- 
-2.42.0
+2.43.0
 

@@ -24,4 +24,7 @@ In order to build glfw, same guide from the [compilation guide](https://www.glfw
 In order to use it on Minecraft, just add this to your VM options.
 `-Dorg.lwjgl.glfw.libname=/your_download_path/libglfw.so.3.4`
 
+To use the patched GLFW library with Nvidia GPUs the `__GL_THREADED_OPTIMIZATIONS`
+environment variable needs to be set to `0`.
+
 The shared library is downloadable from our [release page](https://github.com/BoyOrigin/glfw-wayland/releases)
